@@ -1,0 +1,25 @@
+server:
+  port: 8082
+  undertow: 
+    ioThreads: 15
+    workerThreads: 150
+    accesslog: 
+      enabled: true
+  compression: 
+    enabled: true
+    mimeTypes: text/xml, text/css, text/html, application/json
+    minResponseSize: 4096
+
+spring:
+  application: 
+    name: backend
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/promocity
+    username: root
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: MYSQL
+    show-sql: true
