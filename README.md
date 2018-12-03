@@ -56,6 +56,8 @@ http://localhost:8082/promocity
 
 mostra os seguintes recursos disponíveis
 
+Armando:
+
 "http://localhost:8082/promocity/users"
 "http://localhost:8082/promocity/users/{idUser}"
 "http://localhost:8082/promocity/users/{idUser}/coupons"
@@ -67,6 +69,31 @@ mostra os seguintes recursos disponíveis
 "http://localhost:8082/promocity/stores/{idStore}/promotions/{idPromotion}/coupons"
 "http://localhost:8082/promocity/stores/{idStore}/promotions/{idPromotion}/coupons/{idCoupon}"
 "http://localhost:8082/promocity/stores/{idStore}/promotions/{idPromotion}/reportcoupons/{idCoupon}"
+
+Fabiano:
+
+Coletar cupons das lojas em que o usuário encontra-se no raio de proximidade. Também atualiza a posição atual do usuário e registra a posição no histórico.
+"http://localhost:8082/promocity/users/{idUser}/catchCouponsInLocation/{latitude}/{longitude}"
+
+Atualiza a posição atual do usuário e registra a posição no histórico.
+"http://localhost:8082/promocity/users/{idUser}/updateLocation/{latitude}/{longitude}"
+
+Ativar um cupom simples.
+"http://localhost:8082/promocity/coupons/{idCoupon}/activate"
+Ativar um cupom coletivo.
+"http://localhost:8082/promocity/coupons/{idCoupon}/activateByUserFriend/{idUser}"
+Ativar um cupom coletivo por qrcode.
+"http://localhost:8082/promocity/coupons/qrCode/{qrCode}/activateByUserFriend/{idUser}"
+Consumir um cupom.
+"http://localhost:8082/promocity/coupons/{idCoupon}/consume"
+Obter a imagem do QRCode
+"http://localhost:8082/promocity/coupons/{idCoupon}/qrCodeImage"
+
+Buscar lojas em que o usuário encontra-se no raio de proximidade.
+"http://localhost:8082/promocity/stores/location/{latitude}/{longitude}"
+
+Buscar promoções de lojas em que o usuário encontra-se no raio de proximidade.
+"http://localhost:8082/promocity/promotions/location/{latitude}/{longitude}"
 
 Referências
 ---

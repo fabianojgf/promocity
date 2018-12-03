@@ -1,15 +1,6 @@
 package ufc.cmu.promocity.backend.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -113,6 +104,17 @@ public class Coupon extends AbstractModel<Long>{
      */
     public boolean isValidCoupon() {
     	return !isActivated() && !isConsumed();
+    }
+    
+    public void updateQrCode() {
+    	StringBuilder code = new StringBuilder();
+    	code.append(getId());
+    	code.append("_");
+    	code.append(getPromotion().getId());
+    	code.append("_");
+    	code.append(getUser().getId());
+
+    	qrCode = code.toString();
     }
 
 }

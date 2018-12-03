@@ -16,6 +16,7 @@ public interface CouponsRepository extends JpaRepository<Coupon, Long>{
 	List<Coupon> findByUser(User user);
 	List<Coupon> findByPromotion(Promotion promotion);
 	List<Coupon> findByUserAndPromotion(User user, Promotion promotion);
+	Coupon findByQrCode(String qrCode);
 	
 	@Query("select c from Coupon c join c.promotion p where p.store = ?1")
 	List<Coupon> findWithStore(Store store);

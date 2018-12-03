@@ -236,7 +236,7 @@ public class UserController {
      */
     @GET
     @Produces("application/json")
-    @Path("/{idUser}/coletarCoupons/latitude/{latitude}/longitude/{longitude}")
+    @Path("/{idUser}/catchCouponsInLocation/{latitude}/{longitude}")
     public List<Coupon> catchNearCoupons(@PathParam("idUser") String idUser, 
     		@PathParam("latitude") String latitude, 
     		@PathParam("longitude") String longitude) {
@@ -246,6 +246,9 @@ public class UserController {
     	double longitudeValue = Double.parseDouble(longitude);
     	
     	/*Salbando a localizacão do usuário*/
+    	user.setLatitude(latitudeValue);
+    	user.setLongitude(longitudeValue);
+    	userService.save(user);
     	
     	Track track = new Track();
     	track.setDate(new Date());
@@ -271,6 +274,9 @@ public class UserController {
     			coupon.setNumRequiredCoUsers(promotion.getNumRequiredCoUsers());
     			couponService.save(coupon);
     			
+    			coupon.updateQrCode();
+    	        couponService.save(coupon);
+    			
     			promotion.setNumReleasedCoupons(promotion.getNumReleasedCoupons() + 1);
     			promotionService.save(promotion);
     		}
@@ -281,18 +287,24 @@ public class UserController {
     
     @GET
     @Produces("application/json")
-    @Path("/{idUser}/updateLocation/latitude/{latitude}/longitude/{longitude}")
+    @Path("/{idUser}/updateLocation/{latitude}/{longitude}")
     public Response updateUserLocation(@PathParam("idUser") String idUser, 
     		@PathParam("latitude") String latitude, 
     		@PathParam("longitude") String longitude) {
     	User user = userService.get(Long.parseLong(idUser));
+    	double latitudeValue = Double.parseDouble(latitude);
+    	double longitudeValue = Double.parseDouble(longitude);
+    	
+    	/*Salbando a localizacão do usuário*/
+    	user.setLatitude(latitudeValue);
+    	user.setLongitude(longitudeValue);
+    	userService.save(user);
     	
     	Track track = new Track();
     	track.setDate(new Date());
-    	track.setLatitude(Double.parseDouble(latitude));
-    	track.setLongitude(Double.parseDouble(longitude));
+    	track.setLatitude(latitudeValue);
+    	track.setLongitude(longitudeValue);
     	track.setUser(user);
-    	
     	trackService.save(track);
     	
     	return Response.ok().build();

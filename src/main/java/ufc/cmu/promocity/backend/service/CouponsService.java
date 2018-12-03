@@ -30,4 +30,8 @@ public class CouponsService extends AbstractService<Coupon, Long>{
 	public List<Coupon> findByUserAndPromotion(User user, Promotion promotion) {
 		return couponsRepository.findByUserAndPromotion(user, promotion);
 	}
+	
+	public Coupon findByQrCode(String qrCode) {
+		return couponsRepository.findByQrCode(qrCode);
+	}
 }

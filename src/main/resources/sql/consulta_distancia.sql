@@ -41,7 +41,7 @@ INSERT INTO radius VALUES (1, 'MILES', 3959), (2, 'KILOMETERS', 6371), (3, 'METE
 DROP FUNCTION IF EXISTS distance;
 
 DELIMITER $
-CREATE FUNCTION distance(lat1 DOUBLE, long1 DOUBLE, lat2 DOUBLE, long2 DOUBLE, type_radius INT) RETURNS DOUBLE
+CREATE FUNCTION distance_between(lat1 DOUBLE, long1 DOUBLE, lat2 DOUBLE, long2 DOUBLE, type_radius INT) RETURNS DOUBLE
 BEGIN
        DECLARE r DOUBLE;
        DECLARE distance DOUBLE;
@@ -66,7 +66,7 @@ CREATE FUNCTION is_in_radius(lat1 DOUBLE, long1 DOUBLE, lat2 DOUBLE, long2 DOUBL
 BEGIN
        DECLARE distance DOUBLE;
 
-       SET distance = distance(lat1, long1, lat2, long2, type_radius);
+       SET distance = distance_between(lat1, long1, lat2, long2, type_radius);
 
        RETURN distance <= radius;
 END
@@ -81,7 +81,7 @@ SELECT *, distance(-3.759080, -38.538164, latitude, longitude, 2) FROM stores wh
 
 SELECT *, distance(-3.759080, -38.538164, latitude, longitude, 2) FROM stores where distance(-3.759080, -38.538164, latitude, longitude, 2) > (4.5 as double);
 
-
+select name, type from mysql.proc where db = database() order by type, name;
 
 select store0_.id as id1_2_, store0_.active as active2_2_, 
 store0_.address as address3_2_, store0_.city as city4_2_, 

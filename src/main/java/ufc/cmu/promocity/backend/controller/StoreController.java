@@ -138,7 +138,7 @@ public class StoreController {
      */
     @GET
     @Produces("application/json")
-    @Path("/latitude/{latitude}/longitude/{longitude}")
+    @Path("/location/{latitude}/{longitude}")
     public List<Store> getAllStoresInRadius(@PathParam("latitude") String latitude, @PathParam("longitude") String longitude) {
     	System.out.println("Location: " + latitude  + "," + longitude);
         return storeService.findInRadiusOnDatabase(Double.parseDouble(latitude), Double.parseDouble(longitude));

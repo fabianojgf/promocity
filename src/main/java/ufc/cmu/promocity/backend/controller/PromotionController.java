@@ -127,7 +127,7 @@ public class PromotionController {
      */
     @GET
     @Produces("application/json")
-    @Path("/latitude/{latitude}/longitude/{longitude}")
+    @Path("/location/{latitude}/{longitude}")
     public List<Promotion> getAllStoresInRadius(@PathParam("latitude") String latitude, @PathParam("longitude") String longitude) {
     	System.out.println("Location: " + latitude  + "," + longitude);
         return promotionService.findInsideRadius(Double.parseDouble(latitude), Double.parseDouble(longitude));
