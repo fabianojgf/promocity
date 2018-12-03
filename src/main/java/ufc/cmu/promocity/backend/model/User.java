@@ -20,6 +20,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Type;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ufc.cmu.promocity.backend.model.AbstractModel;
 
@@ -48,24 +49,33 @@ public class User extends AbstractModel<Long>{
 	@Column(length=255)
 	private String email;
 	
+	@Column(columnDefinition="double default 0")
 	private double latitude = 0;
+	
+	@Column(columnDefinition="double default 0")
 	private double longitude = 0;
 	
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="user")
-	private List<Coupon> coupons = new ArrayList<Coupon>();
+	private List<Store> stores = new LinkedList<Store>();
 	
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="user")
-	private List<Track> tracks = new ArrayList<Track>();
+	private List<Coupon> coupons = new LinkedList<Coupon>();
+	
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="user")
+	private List<Track> tracks = new LinkedList<Track>();
 	
 	@JsonBackReference
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name="user_friendship", 
 		joinColumns = { @JoinColumn(name = "user_id") },
         inverseJoinColumns = { @JoinColumn(name = "user_friend_id") })
- 	private List<User> friends = new ArrayList<User>();
+ 	private List<User> friends = new LinkedList<User>();
 	
 	public User() {
-		this.friends = new ArrayList<User>();
+		super();
 	}
 	
 	public User(String username, String password, String email) {
@@ -125,6 +135,21 @@ public class User extends AbstractModel<Long>{
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
+	
+	public List<Store> getStores() {
+		return stores;
+	}
+
+	public void setStores(List<Store> stores) {
+		this.stores = stores;
+	}
+	
+	public void addStore(Store store) {
+		if (!this.alreadyStore(store)) {
+			this.stores.add(store);
+			store.setUser(this);
+		}
+	}
 
 	public List<Coupon> getCoupons() {
 		return coupons;
@@ -137,6 +162,7 @@ public class User extends AbstractModel<Long>{
 	public void addCoupon(Coupon coupon) {
 		if (!this.alreadyCoupon(coupon)) {
 			this.coupons.add(coupon);
+			coupon.setUser(this);
 		}
 	}
 	
@@ -151,6 +177,7 @@ public class User extends AbstractModel<Long>{
 	public void addTrack(Track track) {
 		if (!this.alreadyTrack(track)) {
 			this.tracks.add(track);
+			track.setUser(this);
 		}
 	}
 
@@ -168,7 +195,8 @@ public class User extends AbstractModel<Long>{
 	 */
 	public boolean addFriend(User friend) {
 		if (!alreadyFriend(friend)) {
-			this.friends.add(friend);	
+			this.friends.add(friend);
+			friend.addFriend(this);
 			return true;
 		}else {
 			return false;
@@ -198,14 +226,6 @@ public class User extends AbstractModel<Long>{
 		
 		return false;
 	}
-	
-	public int getAmountOfCoupons() {
-		return this.coupons.size();
-	}
-
-	public int getAmountOfFriends() {
-		return this.friends.size();
-	}
 
 	public String getCompleteName() {
 		return completeName;
@@ -225,10 +245,30 @@ public class User extends AbstractModel<Long>{
 		return false;
 	}
 	
+	public boolean alreadyCouponPromotion(Promotion promotion) {
+		//percorre a lista de cupons e checa se o cupom já está nela
+		for (Coupon element : this.coupons) {
+			if (element.getPromotion().getId() == promotion.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean alreadyTrack(Track track) {
 		//percorre a lista de tracks e checa se a track pesquisada já está nela
 		for (Track element : this.tracks) {
 			if (element.getId() == track.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean alreadyStore(Store store) {
+		//percorre a lista de tracks e checa se a track pesquisada já está nela
+		for (Store element : this.stores) {
+			if (element.getId() == store.getId()) {
 				return true;
 			}
 		}

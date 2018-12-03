@@ -7,7 +7,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;
 
 import ufc.cmu.promocity.backend.context.PromotionArea;
-import ufc.cmu.promocity.backend.controller.BookController;
 import ufc.cmu.promocity.backend.controller.CouponController;
 import ufc.cmu.promocity.backend.controller.PrincipalController;
 import ufc.cmu.promocity.backend.controller.PromotionController;
@@ -37,7 +36,6 @@ public class JerseyConfiguration extends ResourceConfig {
 		//Create a global instance of promotionalArea
 		this.globalPromotionArea = PromotionArea.getInstance();
 		
-		register(BookController.class);
 		register(StoreController.class);
 		register(UserController.class);		
 		register(CouponController.class);

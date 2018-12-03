@@ -20,7 +20,7 @@ public abstract class AbstractModel<Long extends Serializable> implements Serial
     private Long id;
     
     @Column(name="active")
-    private boolean active;
+    private boolean active = true;
 
     public Long getId() {
         return this.id;

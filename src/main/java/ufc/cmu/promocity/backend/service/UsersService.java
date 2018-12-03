@@ -26,7 +26,7 @@ public class UsersService extends AbstractService<User, Long>{
 		return usersRepository;
 	}
 	
-	public User getUserByUserName(String username) {
+	public User getUserByUsername(String username) {
 		return usersRepository.findByUsername(username);
 	}
 	

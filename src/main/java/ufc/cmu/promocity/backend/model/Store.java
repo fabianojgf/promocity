@@ -10,6 +10,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import ufc.cmu.promocity.backend.utils.DistanceUtil;
+import ufc.cmu.promocity.backend.utils.DistanceUtil.Radius;
+
 @Entity
 @Table(name="stores")
 public class Store extends AbstractModel<Long>{
@@ -20,10 +25,11 @@ public class Store extends AbstractModel<Long>{
 	private double latitude;
 	private double longitude;
 	private double radius;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	private User user;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy="store")
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="store")
 	private List<Promotion> promotions = new LinkedList<Promotion>();
 	
 	public Store() {
@@ -107,5 +113,16 @@ public class Store extends AbstractModel<Long>{
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	public double distanceFrom(double latitude, double longitude) {
+		double distance = DistanceUtil.distanteBetween(latitude, longitude, this.latitude, this.longitude, Radius.KILOMETERS);
+		double distance2 = DistanceUtil.distante(latitude, longitude, this.latitude, this.longitude, Radius.KILOMETERS);
+		return distance;
+	}
+	
+	public boolean isInRangeRadius(double latitude, double longitude) {
+		double distance = distanceFrom(latitude, longitude);
+		return distance <= radius;
 	}
 }

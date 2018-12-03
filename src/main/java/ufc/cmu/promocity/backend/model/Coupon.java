@@ -17,8 +17,6 @@ import javax.persistence.Table;
 @Table(name="coupons")
 public class Coupon extends AbstractModel<Long>{
 	
-	@Column(length=255)
-	private String description;
 	@ManyToOne
 	private Promotion promotion;
 	@ManyToOne
@@ -33,24 +31,14 @@ public class Coupon extends AbstractModel<Long>{
 		super();
 	}
 	
-	public Coupon(String description, String qrCode, Promotion promotion, User user) {
+	public Coupon(Promotion promotion, User user) {
 		super();
-		this.description = description;
-		this.qrCode = qrCode;
 		this.promotion = promotion;
 		this.user = user;
 	}
 	
 	public Long getId() {
 		return super.getId();
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
 	}
 	
     public Promotion getPromotion() {
@@ -79,6 +67,22 @@ public class Coupon extends AbstractModel<Long>{
 
 	public boolean isActivated() {
 		return activated;
+	}
+	
+	public Integer getNumRequiredCoUsers() {
+		return numRequiredCoUsers;
+	}
+
+	public void setNumRequiredCoUsers(Integer numRequiredCoUsers) {
+		this.numRequiredCoUsers = numRequiredCoUsers;
+	}
+
+	public Integer getNumActivedCoUsers() {
+		return numActivedCoUsers;
+	}
+
+	public void setNumActivedCoUsers(Integer numActivedCoUsers) {
+		this.numActivedCoUsers = numActivedCoUsers;
 	}
 
 	public void setActivated(boolean activated) {

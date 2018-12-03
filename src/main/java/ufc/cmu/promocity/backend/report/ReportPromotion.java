@@ -17,6 +17,21 @@ public class ReportPromotion {
 	private double latitude;
 	private double longitude;
 	
+	public ReportPromotion(Promotion promotion) {
+		this.promotion = promotion;
+		this.store = this.promotion.getStore();
+		
+		this.idPromotion = promotion.getId();
+		this.description = promotion.getDescription();
+		this.fromDate = promotion.getFromDate();
+		this.toDate = promotion.getToDate();
+		
+		this.idStore = store.getId();
+		this.name = store.getName();
+		this.latitude = store.getLatitude();
+		this.longitude = store.getLongitude();
+	}
+	
 	public ReportPromotion(Promotion promotion, Store store) {
 		this.promotion = promotion;
 		this.store = store;

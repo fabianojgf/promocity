@@ -13,7 +13,7 @@ public class Track extends AbstractModel<Long>{
 	private double latitude;
 	private double longitude;
 	private Date date;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	private User user;
 	
 	public Track() {

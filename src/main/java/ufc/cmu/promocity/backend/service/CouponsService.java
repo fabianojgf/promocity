@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import ufc.cmu.promocity.backend.model.Coupon;
 import ufc.cmu.promocity.backend.model.Promotion;
+import ufc.cmu.promocity.backend.model.User;
 import ufc.cmu.promocity.backend.repository.CouponsRepository;
 
 /**
@@ -26,4 +27,7 @@ public class CouponsService extends AbstractService<Coupon, Long>{
 		return couponsRepository;
 	}
 	
+	public List<Coupon> findByUserAndPromotion(User user, Promotion promotion) {
+		return couponsRepository.findByUserAndPromotion(user, promotion);
+	}
 }

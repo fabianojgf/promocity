@@ -33,6 +33,7 @@ public class PrincipalController {
 	String s5 = "http://localhost:8082/promocity/stores/{idStore}/promotions/{idPromotion}/coupons";
 	String s6 = "http://localhost:8082/promocity/stores/{idStore}/promotions/{idPromotion}/coupons/{idCoupon}";
 	String s7 = "http://localhost:8082/promocity/stores/{idStore}/promotions/{idPromotion}/reportcoupons/{idCoupon}";
+	String s8 = "http://localhost:8082/promocity/stores/latitude/{latitude}/longitude/{longitude}";
 
 	public PrincipalController() {		
 		this.listDetalhes.addDetalhe(u1);
@@ -51,6 +52,7 @@ public class PrincipalController {
 		this.listDetalhes.addDetalhe(s5);
 		this.listDetalhes.addDetalhe(s6);
 		this.listDetalhes.addDetalhe(s7);
+		this.listDetalhes.addDetalhe(s8);
 	}
 	
 	/**

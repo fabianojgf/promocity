@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="promotions")
 public class Promotion extends AbstractModel<Long>{
@@ -20,13 +22,14 @@ public class Promotion extends AbstractModel<Long>{
 	private Date toDate;
 	@ManyToOne
 	private Store store;
-	private Integer numRequiredCoUsers;
+	private Integer numRequiredCoUsers = 0;
 	private Integer numMaxCoupons;
-	private Integer numReleasedCoupons;
+	private Integer numReleasedCoupons = 0;
 	private boolean special = false;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy="promotion")
-	private List<Coupon> coupons;
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="promotion")
+	private List<Coupon> coupons = new LinkedList<Coupon>();
 	
 	public Promotion() {
 		super();
@@ -110,5 +113,11 @@ public class Promotion extends AbstractModel<Long>{
 
 	public void setCoupons(List<Coupon> coupons) {
 		this.coupons = coupons;
-	}			
+	}
+	
+	public boolean hasAvailableCoupons() {
+		return numMaxCoupons == null 
+				|| numReleasedCoupons == null 
+				|| numMaxCoupons > numReleasedCoupons;
+	}
 }

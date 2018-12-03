@@ -1,6 +1,7 @@
 package ufc.cmu.promocity.backend.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import ufc.cmu.promocity.backend.context.PromotionArea;
 import ufc.cmu.promocity.backend.model.Coupon;
@@ -36,6 +38,7 @@ import ufc.cmu.promocity.backend.utils.Message;
  */
 @Component
 @Path("/stores")
+@Transactional
 public class StoreController {
 	private StoreService storeService;
 	public PromotionArea globalPromotionArea;	
@@ -127,6 +130,18 @@ public class StoreController {
     public Response deleteStore(@PathParam("id") String id) {
         storeService.delete(Long.parseLong(id));
         return Response.ok().build();
+    }
+    
+    /**
+     * Retorna em um JSON todos as lojas dentro do raio
+     * @return lista de lojas
+     */
+    @GET
+    @Produces("application/json")
+    @Path("/latitude/{latitude}/longitude/{longitude}")
+    public List<Store> getAllStoresInRadius(@PathParam("latitude") String latitude, @PathParam("longitude") String longitude) {
+    	System.out.println("Location: " + latitude  + "," + longitude);
+        return storeService.findInRadiusOnDatabase(Double.parseDouble(latitude), Double.parseDouble(longitude));
     }
     
     /**

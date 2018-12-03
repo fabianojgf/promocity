@@ -9,6 +9,7 @@ import ufc.cmu.promocity.backend.model.Track;
 import ufc.cmu.promocity.backend.model.User;
 import ufc.cmu.promocity.backend.report.ReportCoupon;
 import ufc.cmu.promocity.backend.service.CouponsService;
+import ufc.cmu.promocity.backend.service.PromotionsService;
 import ufc.cmu.promocity.backend.service.StoreService;
 import ufc.cmu.promocity.backend.service.TrackService;
 import ufc.cmu.promocity.backend.service.UsersService;
@@ -18,6 +19,7 @@ import ufc.cmu.promocity.backend.utils.Message;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,7 @@ import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.CustomSQLExceptionTranslatorRegistrar;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -44,13 +47,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path("/users")
+@Transactional
 public class UserController {
 	private UsersService userService;
-	private UserLocationMonitoring userLocationMonitoring;
-	public PromotionArea globalPromotionArea;
 	private StoreService storeService;	
 	private CouponsService couponService;
 	private TrackService trackService;
+	private PromotionsService promotionService;
+	
+	private UserLocationMonitoring userLocationMonitoring;
+	public PromotionArea globalPromotionArea;
 
 	@Autowired
 	public void setTrackService(TrackService trackService) {
@@ -72,6 +78,11 @@ public class UserController {
 		this.storeService = storeService;
 	}
 	
+	@Autowired
+	public void setPromotionService(PromotionsService promotionService) {
+		this.promotionService = promotionService;
+	}
+
 	/**
 	 * Contrutor of UserController
 	 * @param userService
@@ -213,6 +224,78 @@ public class UserController {
     @Path("/{id}/coupons")
     public List<Coupon> getAllCouponsfromUser(@PathParam("id") String id) {
         return userService.get(Long.parseLong(id)).getCoupons();
+    }
+    
+    /**
+     * Get all coupons from specific idUser
+		users/id/coupons
+ 
+     * Retorna em um JSON todas os cupons de um dado user cadastrado
+     * id do user
+     * @return lista de cupons de um usuario
+     */
+    @GET
+    @Produces("application/json")
+    @Path("/{idUser}/coletarCoupons/latitude/{latitude}/longitude/{longitude}")
+    public List<Coupon> catchNearCoupons(@PathParam("idUser") String idUser, 
+    		@PathParam("latitude") String latitude, 
+    		@PathParam("longitude") String longitude) {
+    	
+    	User user = userService.get(Long.parseLong(idUser));
+    	double latitudeValue = Double.parseDouble(latitude);
+    	double longitudeValue = Double.parseDouble(longitude);
+    	
+    	/*Salbando a localizacão do usuário*/
+    	
+    	Track track = new Track();
+    	track.setDate(new Date());
+    	track.setLatitude(latitudeValue);
+    	track.setLongitude(longitudeValue);
+    	track.setUser(user);
+    	
+    	trackService.save(track);
+    	
+    	/*Coletando os cupons de acordo com a localizacão do usuário*/
+    	
+    	List<Promotion> nearPromtions = promotionService.findInsideRadius(latitudeValue, longitudeValue);
+    	
+    	Iterator<Promotion> it = nearPromtions.iterator();
+    	while(it.hasNext()) {
+    		Promotion promotion = it.next();
+    		
+    		if(promotion.hasAvailableCoupons() 
+    				&& !user.alreadyCouponPromotion(promotion)) {
+    			Coupon coupon = new Coupon();
+    			coupon.setUser(user);
+    			coupon.setPromotion(promotion);
+    			coupon.setNumRequiredCoUsers(promotion.getNumRequiredCoUsers());
+    			couponService.save(coupon);
+    			
+    			promotion.setNumReleasedCoupons(promotion.getNumReleasedCoupons() + 1);
+    			promotionService.save(promotion);
+    		}
+    	}
+    	
+        return userService.get(Long.parseLong(idUser)).getCoupons();
+    }
+    
+    @GET
+    @Produces("application/json")
+    @Path("/{idUser}/updateLocation/latitude/{latitude}/longitude/{longitude}")
+    public Response updateUserLocation(@PathParam("idUser") String idUser, 
+    		@PathParam("latitude") String latitude, 
+    		@PathParam("longitude") String longitude) {
+    	User user = userService.get(Long.parseLong(idUser));
+    	
+    	Track track = new Track();
+    	track.setDate(new Date());
+    	track.setLatitude(Double.parseDouble(latitude));
+    	track.setLongitude(Double.parseDouble(longitude));
+    	track.setUser(user);
+    	
+    	trackService.save(track);
+    	
+    	return Response.ok().build();
     }
 
     /**

@@ -1,7 +1,10 @@
 package ufc.cmu.promocity.backend.controller;
 
 import ufc.cmu.promocity.backend.model.Coupon;
+import ufc.cmu.promocity.backend.model.Promotion;
+import ufc.cmu.promocity.backend.model.User;
 import ufc.cmu.promocity.backend.service.CouponsService;
+import ufc.cmu.promocity.backend.service.UsersService;
 
 import java.net.URI;
 import java.util.LinkedList;
@@ -28,12 +31,19 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Path("/coupons")
+@Transactional
 public class CouponController {
 	private CouponsService couponService;
+	private UsersService userService;
 	
 	@Autowired
 	public void setCouponService(CouponsService couponServices){
 		this.couponService = couponServices;
+	}
+	
+	@Autowired
+	public void setUsersService(UsersService userService) {
+		this.userService = userService;
 	}
 	
 	/**
@@ -105,6 +115,108 @@ public class CouponController {
     public Response deletecoupon(@PathParam("id") String id) {
         couponService.delete(Long.parseLong(id));
         return Response.ok().build();
+    }
+    
+    /**
+     * Marca um cupom simples como ativado.
+     * @param id
+     * @return código http
+     */
+    @GET
+    @Produces("application/json")
+    @Path("/{id}/activate")
+    public Response activateCoupon(@PathParam("id") String id) {
+    	Coupon coupon = couponService.get(Long.parseLong(id));
+    	
+    	if(coupon.isRequiredCoUsers()) {
+    		System.out.println("Esse cupom necessita de " + coupon.getNumActivedCoUsers() + " usuários para ativar.");
+    		return Response.ok("Esse cupom necessita de " + coupon.getNumActivedCoUsers() + " usuários para ativar.").build();
+    	}
+    	
+    	if(coupon.isActivated()) {
+    		System.out.println("Cupom já foi ativado.");
+    		return Response.ok("Cupom já foi ativado.").build();
+    	}
+    	else {
+    		coupon.setActivated(true);
+    		couponService.save(coupon);
+    		return Response.ok("Cupom ativado com sucesso.").build();
+    	}	
+    }
+    
+    /**
+     * Marca um cupom coletivo como ativado.
+     * @param id
+     * @return código http
+     */
+    @GET
+    @Produces("application/json")
+    @Path("/user/{idUser}/activate/coupon/{idCoupon}")
+    public Response activateFriendCoupon(@PathParam("idUser") String idUser, @PathParam("idCoupon") String idCoupon) {
+    	Coupon coupon = couponService.get(Long.parseLong(idCoupon));
+    	
+    	User user = userService.get(Long.parseLong(idUser));
+    	List<Coupon> couponsUserPromotion = couponService.findByUserAndPromotion(user, coupon.getPromotion());
+    	
+    	if(!coupon.isRequiredCoUsers()) {
+    		System.out.println("Esse cupom não necessita de outros usuários para ativar.");
+    		return Response.ok("Esse cupom não necessita de outros usuários para ativar.").build();
+    	}
+    	
+    	if(coupon.getUser().getId() == user.getId()) {
+    		System.out.println("Esse tipo de cupom não ser ativado pelo proprietário.");
+    		return Response.ok("Esse tipo de cupom não ser ativado pelo proprietário.").build();
+    	}
+    	
+    	if(!user.alreadyFriend(coupon.getUser())) {
+    		System.out.println("O proprietário desse cupom não é seu amigo.");
+    		return Response.ok("O proprietário desse cupom não é seu amigo.").build();
+    	}
+    	
+    	if(couponsUserPromotion.isEmpty()) {
+    		System.out.println("O usuário não possui um cupom dessa mesma promoção.");
+    		return Response.ok("O usuário não possui um cupom dessa mesma promoção.").build();
+    	}
+    	
+    	if(coupon.isActivated()) {
+    		System.out.println("Cupom já foi ativado.");
+    		return Response.ok("Cupom já foi ativado.").build();
+    	}
+    	else {
+    		coupon.setNumActivedCoUsers(coupon.getNumActivedCoUsers() + 1);
+    		if(coupon.getNumActivedCoUsers() >= coupon.getNumRequiredCoUsers())
+    			coupon.setActivated(true);
+    		couponService.save(coupon);
+    		
+    		Coupon sameCouponUser = couponsUserPromotion.get(0);
+    		sameCouponUser.setNumActivedCoUsers(sameCouponUser.getNumActivedCoUsers() + 1);
+    		if(sameCouponUser.getNumActivedCoUsers() >= sameCouponUser.getNumRequiredCoUsers())
+    			sameCouponUser.setActivated(true);
+    		couponService.save(sameCouponUser);
+    		
+    		return Response.ok("Cupom ativado com sucesso.").build();
+    	}	
+    }
+    
+    /**
+     * Marca um cupom como utilizado/consumido.
+     * @param id
+     * @return código http
+     */
+    @GET
+    @Produces("application/json")
+    @Path("/{id}/consume")
+    public Response consumeCoupon(@PathParam("id") String id) {
+    	Coupon coupon = couponService.get(Long.parseLong(id));
+    	if(coupon.isConsumed()) {
+    		System.out.println("Cupom já foi consumido.");
+    		return Response.notModified("Cupom já foi consumido.").build();
+    	}
+    	else {
+    		coupon.setConsumed(true);
+    		couponService.save(coupon);
+    		return Response.noContent().build();
+    	}
     }
     
 }

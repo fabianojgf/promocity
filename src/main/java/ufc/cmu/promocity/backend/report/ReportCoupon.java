@@ -19,8 +19,26 @@ public class ReportCoupon {
 	private double latitude;
 	private double longitude;
 	private long idCoupon;
-	private String descriptionCoupon;
 	private String qrCode;
+	
+	public ReportCoupon(Coupon coupon) {
+		this.coupon = coupon;
+		this.promotion = this.coupon.getPromotion();
+		this.store = this.promotion.getStore();
+		
+		this.idPromotion = promotion.getId();
+		this.descriptionPromotion = promotion.getDescription();
+		this.fromDate = promotion.getFromDate();
+		this.toDate = promotion.getToDate();
+		
+		this.idStore = store.getId();
+		this.name = store.getName();
+		this.latitude = store.getLatitude();
+		this.longitude = store.getLongitude();
+		
+		this.idCoupon = coupon.getId();
+		this.qrCode = coupon.getQrCode();
+	}
 	
 	public ReportCoupon(Store store, Promotion promotion, Coupon coupon) {
 		this.promotion = promotion;
@@ -35,7 +53,6 @@ public class ReportCoupon {
 		this.latitude = store.getLatitude();
 		this.longitude = store.getLongitude();
 		this.idCoupon = coupon.getId();
-		this.descriptionCoupon = coupon.getDescription();
 		this.qrCode = coupon.getQrCode();
 	}
 
@@ -109,14 +126,6 @@ public class ReportCoupon {
 
 	public void setIdCoupon(long idCoupon) {
 		this.idCoupon = idCoupon;
-	}
-
-	public String getDescriptionCoupon() {
-		return descriptionCoupon;
-	}
-
-	public void setDescriptionCoupon(String descriptionCoupon) {
-		this.descriptionCoupon = descriptionCoupon;
 	}
 
 	public String getQrCode() {
